@@ -16,7 +16,18 @@ describe('Resilience Layer', () => {
       const delay1 = backoff.calculate(1);
       const delay2 = backoff.calculate(2);
       
+      expect(delay1).toBe(200);
+      expect(delay2).toBe(400);
       expect(delay1).toBeLessThan(delay2);
+    });
+
+    it('keeps full-jitter delays within [0, cap)', () => {
+      const backoff = new ExponentialBackoff({ baseDelayMs: 100, maxDelayMs: 300 });
+      for (let i = 0; i < 200; i++) {
+        const d = backoff.calculate(5);
+        expect(d).toBeGreaterThanOrEqual(0);
+        expect(d).toBeLessThanOrEqual(300);
+      }
     });
 
     it('respects retry-after hint', () => {
@@ -82,11 +93,40 @@ describe('Resilience Layer', () => {
 
       const now = Date.now();
       breaker.recordFailure(now);
-      breaker.recordSuccess(now + 101);
+      expect(breaker.getState(now)).toBe('open');
 
-      expect(breaker.getState(now + 101)).toBe('half-open');
-      // After success on half-open, should close
+      // First request after openDurationMs is the probe; one success (halfOpenProbes: 1) closes it
+      breaker.recordSuccess(now + 101);
       expect(breaker.getState(now + 102)).toBe('closed');
+    });
+
+    it('reopens when the half-open probe fails', () => {
+      const breaker = new CircuitBreaker({
+        failureThreshold: 1,
+        windowMs: 1000,
+        openDurationMs: 100,
+        halfOpenProbes: 1,
+      });
+
+      const now = Date.now();
+      breaker.recordFailure(now);
+      breaker.recordFailure(now + 101);
+      expect(breaker.getState(now + 102)).toBe('open');
+      expect(breaker.getState(now + 202)).toBe('half-open');
+    });
+
+    it('ignores failures older than windowMs', () => {
+      const breaker = new CircuitBreaker({
+        failureThreshold: 2,
+        windowMs: 1000,
+        openDurationMs: 100,
+        halfOpenProbes: 1,
+      });
+
+      const now = Date.now();
+      breaker.recordFailure(now);
+      breaker.recordFailure(now + 1500);
+      expect(breaker.getState(now + 1500)).toBe('closed');
     });
   });
 

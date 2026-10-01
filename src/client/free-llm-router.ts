@@ -5,6 +5,20 @@ import { ModelResolver } from '../router/model-resolver';
 import { LLMRouter, type RouterConfig, type RouterResponse } from '../router/router';
 import { MODEL_CATALOG } from '../catalog';
 
+/** Providers enabled when config.providers is not given (all have a no-card free tier). */
+export const DEFAULT_PROVIDERS: ProviderId[] = ['groq', 'gemini', 'mistral', 'openrouter'];
+
+/** Default aliases. Every entry must exist in MODEL_CATALOG (enforced by tests). */
+export const DEFAULT_ALIASES: Record<string, readonly string[]> = {
+  fast: ['groq:openai/gpt-oss-20b', 'gemini:gemini-3.5-flash-lite', 'openrouter:qwen/qwen3.8-27b:free'],
+  default: [
+    'groq:openai/gpt-oss-120b',
+    'gemini:gemini-3.8-flash',
+    'mistral:mistral-small-2603',
+    'openrouter:nvidia/nemotron-3-super-120b-a12b:free',
+  ],
+};
+
 export interface FreeLLMRouterConfig {
   providers?: ProviderId[];
   apiKeys?: Partial<Record<ProviderId, string>>;
@@ -33,6 +47,7 @@ export class FreeLLMRouter {
       gemini: config.apiKeys?.gemini || process.env.GOOGLE_API_KEY,
       cohere: config.apiKeys?.cohere || process.env.COHERE_API_KEY,
       cloudflare: config.apiKeys?.cloudflare || process.env.CLOUDFLARE_API_TOKEN,
+      openrouter: config.apiKeys?.openrouter || process.env.OPENROUTER_API_KEY,
     };
 
     // Filter to only configured providers
@@ -43,8 +58,7 @@ export class FreeLLMRouter {
     // Create registry
     const registry = new DefaultProviderRegistry(configuredKeys);
 
-    // Create mock catalog (Phase 1: minimal set)
-        // Build catalog from MODEL_CATALOG, grouped by provider
+    // Build catalog from MODEL_CATALOG, grouped by provider
     const catalog: Record<ProviderId, ProviderModel[]> = {
       groq: [],
       mistral: [],
@@ -65,10 +79,7 @@ export class FreeLLMRouter {
     // Create model resolver
     const modelResolver = new ModelResolver({
       providers: catalog,
-      aliases: config.aliases || {
-        fast: ['groq:openai/gpt-oss-120b', 'mistral:mistral-small-3.1-24b-instruct'],
-        default: ['mistral:mistral-small-3.1-24b-instruct', 'gemini:gemini-2.5-flash', 'groq:openai/gpt-oss-120b'],
-      },
+      aliases: config.aliases || DEFAULT_ALIASES,
       defaultAlias: config.defaultAlias || 'default',
       unknownModelPolicy: 'use-default-alias',
     });
@@ -76,7 +87,7 @@ export class FreeLLMRouter {
     // Create router
     const routerConfig: RouterConfig = {
       providers: Object.fromEntries(
-        (config.providers || ['groq', 'mistral', 'gemini']).map((p) => [p, true])
+        (config.providers || DEFAULT_PROVIDERS).map((p) => [p, true])
       ) as Record<ProviderId, boolean>,
       aliases: config.aliases || {},
       defaultAlias: config.defaultAlias || 'default',
