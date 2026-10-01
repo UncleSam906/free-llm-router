@@ -7,6 +7,15 @@ export interface ModelResolverConfig {
   unknownModelPolicy: 'use-default-alias' | 'reject';
 }
 
+/**
+ * Split "provider:model" on the FIRST colon only, so model IDs that contain
+ * colons (e.g. OpenRouter "qwen/qwen3.8-27b:free") stay intact.
+ */
+export function splitProviderKey(key: string): [string, string] {
+  const i = key.indexOf(':');
+  return i === -1 ? [key, ''] : [key.slice(0, i), key.slice(i + 1)];
+}
+
 export class ModelResolver {
   private config: ModelResolverConfig;
 
@@ -19,7 +28,7 @@ export class ModelResolver {
 
     // Hard pin: "groq:openai/gpt-oss-120b"
     if (modelRequest.includes(':')) {
-      const [providerPrefix, modelId] = modelRequest.split(':');
+      const [providerPrefix, modelId] = splitProviderKey(modelRequest);
       const provider = providerPrefix as ProviderId;
       const models = this.config.providers[provider];
       if (models) {
@@ -69,7 +78,7 @@ export class ModelResolver {
     if (!modelIds) return candidates;
 
     for (const modelId of modelIds) {
-      const [providerPrefix, id] = modelId.split(':');
+      const [providerPrefix, id] = splitProviderKey(modelId);
       const provider = providerPrefix as ProviderId;
       const models = this.config.providers[provider];
 

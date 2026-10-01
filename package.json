@@ -37,7 +37,7 @@
   "author": "Jason",
   "license": "MIT",
   "engines": {
-    "node": ">=20"
+    "node": "^20.19.0 || >=22.12.0"
   },
   "dependencies": {
     "zod": "^3.22.0"
@@ -47,13 +47,13 @@
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
-    "@typescript-eslint/eslint-plugin": "^6.0.0",
-    "@typescript-eslint/parser": "^6.0.0",
-    "@vitest/ui": "^1.0.0",
-    "eslint": "^8.45.0",
+    "@typescript-eslint/eslint-plugin": "^8.71.0",
+    "@typescript-eslint/parser": "^8.71.0",
+    "@vitest/ui": "^4.1.11",
+    "eslint": "^8.57.1",
     "prettier": "^3.0.0",
     "ts-node": "^10.9.0",
     "typescript": "^5.1.0",
-    "vitest": "^1.0.0"
+    "vitest": "^4.1.11"
   }
 }

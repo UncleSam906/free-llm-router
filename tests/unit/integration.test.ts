@@ -13,8 +13,8 @@ describe('FreeLLMRouter Integration', () => {
         gemini: 'test-gemini-key',
       },
       aliases: {
-        fast: ['groq:openai/gpt-oss-120b', 'mistral:mistral-small-3.1-24b-instruct'],
-        default: ['mistral:mistral-small-3.1-24b-instruct', 'gemini:gemini-2.5-flash'],
+        fast: ['groq:openai/gpt-oss-20b', 'gemini:gemini-3.5-flash-lite'],
+        default: ['groq:openai/gpt-oss-120b', 'gemini:gemini-3.8-flash', 'mistral:mistral-small-2603'],
       },
       defaultAlias: 'default',
     });

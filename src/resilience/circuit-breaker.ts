@@ -38,6 +38,9 @@ export class CircuitBreaker {
   }
 
   recordSuccess(now: number = Date.now()): void {
+    // Apply any time-based open -> half-open transition first, so a probe
+    // that succeeds after openDurationMs counts even if getState() wasn't called.
+    this.getState(now);
     if (this.state === 'half-open') {
       this.halfOpenProbes++;
       if (this.halfOpenProbes >= this.config.halfOpenProbes) {
@@ -51,14 +54,20 @@ export class CircuitBreaker {
   }
 
   recordFailure(now: number = Date.now()): void {
+    this.getState(now);
     if (this.state === 'half-open') {
       this.state = 'open';
       this.openedAt = now;
       return;
     }
 
+    if (this.state === 'open') {
+      return;
+    }
+
+    // getState() already pruned failures outside windowMs
     this.failureTimestamps.push(now);
-    this.failureCount++;
+    this.failureCount = this.failureTimestamps.length;
 
     if (this.failureCount >= this.config.failureThreshold) {
       this.state = 'open';
