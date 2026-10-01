@@ -53,6 +53,7 @@ export class FreeLLMRouter {
       together: [],
       huggingface: [],
       replicate: [],
+      openrouter: [],
       cohere: [],
       cloudflare: [],
     };
@@ -86,4 +87,5 @@ export class FreeLLMRouter {
     this.router = new LLMRouter(registry, modelResolver, routerConfig);
   }
 }
+
 

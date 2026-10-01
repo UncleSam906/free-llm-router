@@ -143,3 +143,41 @@ export const MODEL_CATALOG: ProviderModel[] = [
     commercialUseAllowed: true,
   },
 ];
+
+  // ========== OPENROUTER (MULTI-MODEL PROXY) ==========
+  {
+    provider: 'openrouter',
+    modelId: 'anthropic/claude-3.5-sonnet',
+    capabilities: { ...extendedCapabilities, vision: true, tools: true, streaming: true },
+    limits: { tpm: 200000 },
+    commercialUseAllowed: true,
+  },
+  {
+    provider: 'openrouter',
+    modelId: 'anthropic/claude-opus',
+    capabilities: { ...extendedCapabilities, vision: true, tools: true, streaming: true },
+    limits: { tpm: 200000 },
+    commercialUseAllowed: true,
+  },
+  {
+    provider: 'openrouter',
+    modelId: 'openai/gpt-4-turbo',
+    capabilities: { ...extendedCapabilities, vision: true, tools: true, streaming: true },
+    limits: { tpm: 150000 },
+    commercialUseAllowed: true,
+  },
+  {
+    provider: 'openrouter',
+    modelId: 'meta-llama/llama-3.1-70b-instruct',
+    capabilities: { ...extendedCapabilities, tools: true, streaming: true },
+    limits: { tpm: 500000 },
+    commercialUseAllowed: true,
+  },
+  {
+    provider: 'openrouter',
+    modelId: 'qwen/qwen-2.5-72b-instruct',
+    capabilities: { ...defaultCapabilities, jsonMode: true, streaming: true },
+    limits: { tpm: 1000000 },
+    commercialUseAllowed: true,
+  },
+];

@@ -1,6 +1,6 @@
 import type { ChatCompletion, ChatCompletionRequest } from './openai';
 
-export type ProviderId = 'groq' | 'mistral' | 'gemini' | 'ollama' | 'together' | 'huggingface' | 'replicate' | 'cohere' | 'cloudflare';
+export type ProviderId = 'groq' | 'mistral' | 'gemini' | 'ollama' | 'together' | 'huggingface' | 'replicate' | 'openrouter' | 'cohere' | 'cloudflare';
 export type Operation = 'chat' | 'embeddings';
 
 export interface ModelCapabilities {

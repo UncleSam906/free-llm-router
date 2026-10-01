@@ -6,6 +6,7 @@ import { OllamaProvider } from './ollama';
 import { TogetherAIProvider } from './together-ai';
 import { HuggingFaceProvider } from './huggingface';
 import { ReplicateProvider } from './replicate';
+import { OpenRouterProvider } from './openrouter';
 
 export interface ProviderRegistry {
   get(id: ProviderId): ProviderAdapter | null;
@@ -36,6 +37,9 @@ export class DefaultProviderRegistry implements ProviderRegistry {
     }
     if (apiKeys.replicate) {
       this.adapters.set('replicate', new ReplicateProvider(apiKeys.replicate));
+    }
+    if (apiKeys.openrouter) {
+      this.adapters.set('openrouter', new OpenRouterProvider(apiKeys.openrouter));
     }
   }
 
