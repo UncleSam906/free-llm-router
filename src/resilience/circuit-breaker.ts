@@ -38,6 +38,8 @@ export class CircuitBreaker {
   }
 
   recordSuccess(now: number = Date.now()): void {
+    // Apply time-based state transition first
+    this.getState(now);
     // Apply any time-based open -> half-open transition first, so a probe
     // that succeeds after openDurationMs counts even if getState() wasn't called.
     this.getState(now);
